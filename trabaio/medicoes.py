@@ -10,6 +10,14 @@ dados = gerador.sample(range(2_000), 1_000) # na teoria isso
 
 objetivo = dados[len(dados)//2] # vai pegar o número do meio da lista NÃO ordenada, no cao o numero da posicao 500
 
+# A lista já está ordenada quando começa a medição da busca binária.
+dadosOrdenados = sorted(dados)
+
+def medirBuscaBinaria():
+    momentoInicial = perf_counter_ns()
+    busca_binaria(dadosOrdenados, objetivo)
+    return perf_counter_ns() - momentoInicial
+
 def medirSelectionSort() :
     copiaDados = dados.copy() # uso isso porque a funcao de selection altera a lista na memoria, ao inves de criar uma nova lista
                             # e se eu apenas usar o =, ambas as variaveis vao apontar para a mesma lista na memoria
@@ -79,9 +87,13 @@ repetir("Selection Sort", medirSelectionSort)
 repetir("Insertion Sort", medirInsertionSort)
 repetir("Merge Sort", medirMergeSort)
 
-# a busca com sentinela devolve só 1 valor, então fica separada
-soma = 0
-for i in range(repeticoes):
-    soma += medirBuscaLinearSentinela()
-print("Busca com Sentinela")
-print("  Média do total:", soma / repeticoes, "ns")
+# Cada busca isolada devolve apenas o tempo da busca.
+def repetirBusca(nome, medir):
+    soma = 0
+    for _ in range(repeticoes):
+        soma += medir()
+    print(nome)
+    print("  Média da busca:", soma / repeticoes, "ns")
+
+repetirBusca("Busca Binária (lista já ordenada)", medirBuscaBinaria)
+repetirBusca("Busca com Sentinela", medirBuscaLinearSentinela)
