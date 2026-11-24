@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import random
 
-lista = [42, 15, 8, 23, 4, 16, 99, 1]
+lista = [1, 2, 4, 3, 5, 6, 8, 7]
 
 def selection_sort(numbers: list) -> list:
     for i in range(len(numbers)-1):
@@ -35,22 +35,20 @@ def merge_sort(numbers: list) -> list:
         half_length = length // 2
         first_half = merge_sort(numbers[0:half_length])
         second_half = merge_sort(numbers[half_length:length])
-        new_piece = []
         i = 0
         j = 0
+        numbers = []
         while i <= (half_length - 1) and j <= (length - half_length) - 1:
             if first_half[i] < second_half[j]:
-                new_piece.append(first_half[i])
+                numbers.append(first_half[i])
                 i += 1
             else:
-                new_piece.append(second_half[j])
+                numbers.append(second_half[j])
                 j += 1
         if i >= half_length:
-            for index in range(j, length - half_length):
-                new_piece.append(second_half[index])
+            numbers += second_half[j:]
         else:
-            for index in range(i, half_length):
-                new_piece.append(first_half[index])
-        return new_piece
+            numbers += first_half[i:]
+        return numbers
 
-print(insertion_sort(lista))
+print(merge_sort(lista))
