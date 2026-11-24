@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-
 import random
 
-random_list = random.sample(range(101), 31)
+lista = [42, 15, 8, 23, 4, 16, 99, 1]
 
 def selection_sort(numbers: list) -> list:
     for i in range(len(numbers)-1):
@@ -17,10 +16,15 @@ def selection_sort(numbers: list) -> list:
 
 def insertion_sort(numbers: list) -> list:
     for i in range(1, len(numbers)):
+        min = numbers[i]
         for j in range(i-1, -1, -1):
-            if numbers[j] > numbers[i]:
-                numbers[i], numbers[j] = numbers[j], numbers[i]
+            if min < numbers[j]:
+                numbers[i] = numbers[j]
                 i -= 1
+            else:
+                break
+        numbers[i] = min
+
     return numbers
 
 def merge_sort(numbers: list) -> list:
@@ -48,3 +52,5 @@ def merge_sort(numbers: list) -> list:
             for index in range(i, half_length):
                 new_piece.append(first_half[index])
         return new_piece
+
+print(insertion_sort(lista))
