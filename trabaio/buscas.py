@@ -1,4 +1,5 @@
 def busca_binaria(lista, alvo):
+    #lembrando: essa busca precisa receber uma lista ORDENADA, se não morre tudo
     esquerdola = 0
     direitola = len(lista) - 1
 
@@ -14,12 +15,10 @@ def busca_binaria(lista, alvo):
 
     return -1
 
-lista = [2, 5, 8, 12, 16, 23, 38, 56]
-
 
 def BuscaLinearSentinela(lista, alvo):
     #receber uma lista bagunçada
-    #clonar a lista e adicionar o alvo ao final dela (chamado sentinela)
+    #adicionar o alvo ao final dela (chamado sentinela)
     #começar uma comparação do alvo com todos os valores
     #quando achar preciso verificar a posição (ou indice), se for a mesma que a sentinela, o valor não está na lista e retonar -1
     # se estiver na lsita retorna a posicao dela (claro idiota)
@@ -30,8 +29,11 @@ def BuscaLinearSentinela(lista, alvo):
                                                 # lembrando que a sentinela GARANTE que esse valor existe na listaC
         i += 1
     if i != posicaoSentinela:
+        lista.pop() # remove a sentinela da lista, para não alterar a lista original
         return i
+
     else: 
+        lista.pop() # remove a sentinela da lista, para não alterar a lista original
         return -1
 
         # Não se usa esse código de baixo, porque ele verifica sempre se a lista já acabou, e isso atrasa na busca

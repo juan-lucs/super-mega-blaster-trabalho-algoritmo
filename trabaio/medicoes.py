@@ -10,7 +10,7 @@ dados = gerador.sample(range(2_000), 1_000) # na teoria isso
 
 objetivo = dados[len(dados)//2] # vai pegar o número do meio da lista NÃO ordenada, no cao o numero da posicao 500
 
-# A lista já está ordenada quando começa a medição da busca binária.
+# A lista já está ordenada quando começa a medição da binria
 dadosOrdenados = sorted(dados)
 
 def medirBuscaBinaria():
