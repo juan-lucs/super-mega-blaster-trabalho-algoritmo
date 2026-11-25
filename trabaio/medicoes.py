@@ -1,99 +1,74 @@
-from time import perf_counter_ns # bagulho de medir tempo
+from time import perf_counter_ns
 import random
 from buscas import *
 from ordenacao import *
 
+REPETICOES = 10
+TAMANHOS = [1_000, 10_000]
 gerador = random.Random(42)
-dados = gerador.sample(range(2_000), 1_000) # na teoria isso
-                                                #faz exatamente 1.000 sorteios aleatorios pra fazer a lista, um para cada posição.
+
+def sortear(tamanho):
+    lista = gerador.sample(range(tamanho * 2), tamanho)
+    objetivo = lista[tamanho // 2]  # número do meio da lista NÃO ordenada
+    return lista, objetivo
 
 
-objetivo = dados[len(dados)//2] # vai pegar o número do meio da lista NÃO ordenada, no cao o numero da posicao 500
-
-# A lista já está ordenada quando começa a medição da binria
-dadosOrdenados = sorted(dados)
-
-def medirBuscaBinaria():
-    momentoInicial = perf_counter_ns()
-    busca_binaria(dadosOrdenados, objetivo)
-    return perf_counter_ns() - momentoInicial
-
-def medirSelectionSort() :
-    copiaDados = dados.copy() # uso isso porque a funcao de selection altera a lista na memoria, ao inves de criar uma nova lista
-                            # e se eu apenas usar o =, ambas as variaveis vao apontar para a mesma lista na memoria
-    momentoInicial = perf_counter_ns() # essa função não mede tempo, mas pega o momento exato do relógio
-    listaOrdenada = selection_sort(copiaDados)
-    momentoAposOrdenar = perf_counter_ns()
-    busca_binaria(listaOrdenada, objetivo) # precisa me devolver o indice do numero que eu quero, na lista já ordenada pela função de antes
-    momentoFim = perf_counter_ns()
-    tempoDeOrdenacao = momentoAposOrdenar - momentoInicial
-    tempoDeBusca = momentoFim - momentoAposOrdenar
-    tempoTotal = momentoFim - momentoInicial
-    return tempoDeOrdenacao, tempoDeBusca, tempoTotal
-
-def medirMergeSort() :
-    copiaDados = dados.copy()  # tecnicamente eu não preciso fazer isso aqui, já que a função do merge não altera a lista na memória, mas vamos para ficar mais fácil
-    momentoInicial = perf_counter_ns()
-    listaOrdenada = merge_sort(copiaDados)
-    momentoAposOrdenar = perf_counter_ns()
-    busca_binaria(listaOrdenada, objetivo) 
-    momentoFim = perf_counter_ns()
-    tempoDeOrdenacao = momentoAposOrdenar - momentoInicial
-    tempoDeBusca = momentoFim - momentoAposOrdenar
-    tempoTotal = momentoFim - momentoInicial
-    return tempoDeOrdenacao, tempoDeBusca, tempoTotal
-
-def medirInsertionSort():
-        copiaDados = dados.copy() 
-        momentoInicial = perf_counter_ns()
-        listaOrdenada = insertion_sort(copiaDados)
-        momentoAposOrdenar = perf_counter_ns()
-        busca_binaria(listaOrdenada, objetivo) 
-        momentoFim = perf_counter_ns()
-        tempoDeOrdenacao = momentoAposOrdenar - momentoInicial
-        tempoDeBusca = momentoFim - momentoAposOrdenar
-        tempoTotal = momentoFim - momentoInicial
-        return tempoDeOrdenacao, tempoDeBusca, tempoTotal
-
-def medirBuscaLinearSentinela():
-     copiaDados = dados.copy()
-     momentoInicial = perf_counter_ns()
-     BuscaLinearSentinela(copiaDados, objetivo) # Essa busca NÃO precisa da ordenação, ela consegue procurar em uma lista bagunçada
-     momentoFinal = perf_counter_ns()
-     return momentoFinal - momentoInicial
+def medir_selection_sort(lista, objetivo):
+    copia = lista.copy()  #SELECTION altera a lista da memória, então usamos uma cópia
+    inicio = perf_counter_ns()
+    ordenada = selection_sort(copia)
+    busca_binaria(ordenada, objetivo)
+    return perf_counter_ns() - inicio
 
 
+def medir_insertion_sort(lista, objetivo):
+    #INSERTION também altera a lista da memória, então usamos uma cópia
+    copia = lista.copy()
+    inicio = perf_counter_ns()
+    ordenada = insertion_sort(copia)
+    busca_binaria(ordenada, objetivo)
+    return perf_counter_ns() - inicio
 
-# amigos confesso que tudo aqui pra baixo foi IA, eu não entendi uma porra dessas repetições
-repeticoes = 10
 
-def repetir(nome, medir):
-    soma_ordenacao = 0
-    soma_busca = 0
-    soma_total = 0
+def medir_merge_sort(lista, objetivo):
+    inicio = perf_counter_ns()
+    ordenada = merge_sort(lista)  # não altera a original, não precisa de cópia
+    busca_binaria(ordenada, objetivo)
+    return perf_counter_ns() - inicio
 
-    for i in range(repeticoes):
-        ordenacao, busca, total = medir()
-        soma_ordenacao += ordenacao
-        soma_busca += busca
-        soma_total += total
 
-    print(nome)
-    print("  Média da ordenação:", soma_ordenacao / repeticoes, "ns")
-    print("  Média da busca:", soma_busca / repeticoes, "ns")
-    print("  Média do total:", soma_total / repeticoes, "ns")
+def medir_busca_binaria(lista, objetivo):
+    ordenada = sorted(lista)  # ordena ANTES do tempo: aqui medimos só a busca
+    inicio = perf_counter_ns()
+    busca_binaria(ordenada, objetivo)
+    return perf_counter_ns() - inicio
 
-repetir("Selection Sort", medirSelectionSort)
-repetir("Insertion Sort", medirInsertionSort)
-repetir("Merge Sort", medirMergeSort)
 
-# Cada busca isolada devolve apenas o tempo da busca.
-def repetirBusca(nome, medir):
+def medir_busca_sentinela(lista, objetivo):
+    inicio = perf_counter_ns()
+    BuscaLinearSentinela(lista, objetivo)  # funciona na lista bagunçada
+    return perf_counter_ns() - inicio
+
+
+def repetir(medir, lista, objetivo):
     soma = 0
-    for _ in range(repeticoes):
-        soma += medir()
-    print(nome)
-    print("  Média da busca:", soma / repeticoes, "ns")
+    for x in range(REPETICOES):
+        soma += medir(lista, objetivo)
+    return soma / REPETICOES
 
-repetirBusca("Busca Binária (lista já ordenada)", medirBuscaBinaria)
-repetirBusca("Busca com Sentinela", medirBuscaLinearSentinela)
+
+def mostrar(nome, nanossegundos):
+    print(f"  {nome:<26} {nanossegundos / 1_000_000:>12,.3f} ms")
+
+
+for n in TAMANHOS:
+    lista, objetivo = sortear(n)
+
+    print(f"\nLista de {n} elementos:")
+
+    print(f"Selection Sort + busca {repetir(medir_selection_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+    print(f"Insertion Sort + busca {repetir(medir_insertion_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+    print(f"Merge Sort + busca {repetir(medir_merge_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+    print(f"Busca binária (só busca) {repetir(medir_busca_binaria, lista, objetivo) / 1_000_000:>12,.3f} ms")
+    print(f"Busca Linear com sentinela {repetir(medir_busca_sentinela, lista, objetivo) / 1_000_000:>12,.3f} ms")
+   

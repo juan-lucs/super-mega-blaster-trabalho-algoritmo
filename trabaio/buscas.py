@@ -29,12 +29,12 @@ def BuscaLinearSentinela(lista, alvo):
                                                 # lembrando que a sentinela GARANTE que esse valor existe na listaC
         i += 1
     if i != posicaoSentinela:
-        lista.pop() # remove a sentinela da lista, para não alterar a lista original
-        return i
+        lista.pop(alvo) # remove a sentinela da lista, para não alterar a lista original
+        return i, lista[i]
 
     else: 
-        lista.pop() # remove a sentinela da lista, para não alterar a lista original
-        return -1
+        lista.pop(alvo) # remove a sentinela da lista, para não alterar a lista original
+        return -1, 0
 
         # Não se usa esse código de baixo, porque ele verifica sempre se a lista já acabou, e isso atrasa na busca
 
