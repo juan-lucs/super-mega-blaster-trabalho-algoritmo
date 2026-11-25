@@ -57,10 +57,6 @@ def repetir(medir, lista, objetivo):
     return soma / REPETICOES
 
 
-def mostrar(nome, nanossegundos):
-    print(f"  {nome:<26} {nanossegundos / 1_000_000:>12,.3f} ms")
-
-
 for n in TAMANHOS:
     lista, objetivo = sortear(n)
 
