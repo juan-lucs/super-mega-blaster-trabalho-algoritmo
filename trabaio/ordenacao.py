@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-import random
-
-lista = [1, 2, 4, 3, 5, 6, 8, 7]
-
 def selection_sort(numbers: list) -> list:
     for i in range(len(numbers)-1):
         smallest = i
@@ -50,5 +45,3 @@ def merge_sort(numbers: list) -> list:
         else:
             numbers += first_half[i:]
         return numbers
-
-print(merge_sort(lista))
