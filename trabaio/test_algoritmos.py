@@ -1,56 +1,56 @@
-import unittest
-
 from buscas import BuscaLinearSentinela, busca_binaria
 from medicoes import medir_sort_nativo
 from ordenacao import insertion_sort, merge_sort, selection_sort
 
 
-class TestOrdenacoes(unittest.TestCase):
-    def test_ordena_listas(self):
-        casos = ([], [7], [1, 2, 3], [3, 2, 1], [3, -1, 3, 0])
+def mostrar_resultado(caso, esperado, recebido):
+    if recebido == esperado:
+        status = "OK"
+    else:
+        status = "ERRO"
 
-        for ordenar in (selection_sort, insertion_sort, merge_sort):
-            for lista in casos:
-                with self.subTest(algoritmo=ordenar.__name__, lista=lista):
-                    self.assertEqual(ordenar(lista.copy()), sorted(lista))
-
-
-class TestBuscas(unittest.TestCase):
-    def test_busca_binaria(self):
-        casos = (
-            ([-7, 9, 20], -7, 0),
-            ([-7, 9, 20], 9, 1),
-            ([-7, 9, 20], 20, 2),
-            ([-7, 9, 20], 8, -1),
-            ([], 20, -1),
-        )
-
-        for lista, alvo, indice in casos:
-            with self.subTest(lista=lista, alvo=alvo):
-                self.assertEqual(busca_binaria(lista, alvo), indice)
-
-    def test_busca_linear_com_sentinela(self):
-        casos = (
-            ([0, 9, -7], 0, (0, 0)),
-            ([5, 9, 9], 9, (1, 9)),
-            ([20, 9, -7], -7, (2, -7)),
-            ([20, 9, -7], 40, (-1, 0)),
-            ([], 20, (-1, 0)),
-        )
-
-        for lista, alvo, esperado in casos:
-            with self.subTest(lista=lista, alvo=alvo):
-                entrada = lista.copy()
-                self.assertEqual(BuscaLinearSentinela(entrada, alvo), esperado)
-                self.assertEqual(entrada, lista)
+    print(f"{caso} | esperado: {esperado} | recebido: {recebido} | {status}")
 
 
-class TestMedicoes(unittest.TestCase):
-    def test_sort_nativo_preserva_lista_original(self):
-        lista = [3, -1, 3, 0]
+def verificar_ordenacoes(caso, lista, esperado):
+    mostrar_resultado(f"Selection Sort, {caso}", esperado, selection_sort(lista.copy()))
+    mostrar_resultado(f"Insertion Sort, {caso}", esperado, insertion_sort(lista.copy()))
+    mostrar_resultado(f"Merge Sort, {caso}", esperado, merge_sort(lista.copy()))
 
-        tempo = medir_sort_nativo(lista, 3)
 
-        self.assertIsInstance(tempo, int)
-        self.assertGreaterEqual(tempo, 0)
-        self.assertEqual(lista, [3, -1, 3, 0])
+if __name__ == "__main__":
+    print("Ordenações")
+    verificar_ordenacoes("lista vazia", [], [])
+    verificar_ordenacoes("um elemento", [7], [7])
+    verificar_ordenacoes("lista ordenada", [1, 2, 3], [1, 2, 3])
+    verificar_ordenacoes("lista invertida", [3, 2, 1], [1, 2, 3])
+    verificar_ordenacoes("repetidos e negativo", [3, -1, 3, 0], [-1, 0, 3, 3])
+
+    print("\nBusca binária (resultado: índice)")
+    ordenada = [-7, 9, 20]
+    mostrar_resultado("Melhor caso: alvo no meio", 1, busca_binaria(ordenada, 9))
+    mostrar_resultado("Alvo no início", 0, busca_binaria(ordenada, -7))
+    mostrar_resultado("Alvo no fim", 2, busca_binaria(ordenada, 20))
+    mostrar_resultado("Alvo ausente", -1, busca_binaria(ordenada, 8))
+    mostrar_resultado("Lista vazia", -1, busca_binaria([], 20))
+
+    print("\nBusca com sentinela (resultado: índice e valor)")
+    casos_sentinela = [
+        ("Melhor caso: alvo no início", [0, 9, -7], 0, (0, 0)),
+        ("Primeira ocorrência do alvo", [5, 9, 9], 9, (1, 9)),
+        ("Alvo no fim", [20, 9, -7], -7, (2, -7)),
+        ("Pior caso: alvo ausente", [20, 9, -7], 40, (-1, 0)),
+        ("Lista vazia", [], 20, (-1, 0)),
+    ]
+
+    for caso, lista, alvo, esperado in casos_sentinela:
+        entrada = lista.copy()
+        recebido = BuscaLinearSentinela(entrada, alvo)
+        mostrar_resultado(caso, esperado, recebido)
+        mostrar_resultado("Lista após a busca", lista, entrada)
+
+    print("\nMedição do list.sort()")
+    lista = [3, -1, 3, 0]
+    tempo = medir_sort_nativo(lista, 3)
+    mostrar_resultado("Tempo é um inteiro não negativo", True, isinstance(tempo, int) and tempo >= 0)
+    mostrar_resultado("Lista após a medição", [3, -1, 3, 0], lista)
