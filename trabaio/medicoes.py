@@ -37,6 +37,13 @@ def medir_merge_sort(lista: list, objetivo: int) -> int:
     return perf_counter_ns() - inicio
 
 
+def medir_sort_nativo(lista: list, _objetivo: int) -> int:
+    copia = lista.copy()
+    inicio = perf_counter_ns()
+    copia.sort()
+    return perf_counter_ns() - inicio
+
+
 def medir_busca_binaria(lista: list, objetivo: int) -> int:
     ordenada = sorted(lista)  # ordena ANTES do tempo: aqui medimos só a busca
     inicio = perf_counter_ns()
@@ -57,13 +64,15 @@ def repetir(medir, lista: list, objetivo: int) -> float:
     return soma / REPETICOES
 
 
-for n in TAMANHOS:
-    lista, objetivo = sortear(n)
+if __name__ == "__main__":
+    for n in TAMANHOS:
+        lista, objetivo = sortear(n)
 
-    print(f"\nLista de {n} elementos:")
+        print(f"\nLista de {n} elementos:")
 
-    print(f"Selection Sort + busca {repetir(medir_selection_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
-    print(f"Insertion Sort + busca {repetir(medir_insertion_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
-    print(f"Merge Sort + busca {repetir(medir_merge_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
-    print(f"Busca binária (só busca) {repetir(medir_busca_binaria, lista, objetivo) / 1_000_000:>12,.3f} ms")
-    print(f"Busca Linear com sentinela {repetir(medir_busca_sentinela, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"Selection Sort + busca {repetir(medir_selection_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"Insertion Sort + busca {repetir(medir_insertion_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"Merge Sort + busca {repetir(medir_merge_sort, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"Busca binária (só busca) {repetir(medir_busca_binaria, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"Busca Linear com sentinela {repetir(medir_busca_sentinela, lista, objetivo) / 1_000_000:>12,.3f} ms")
+        print(f"list.sort() (só ordenação) {repetir(medir_sort_nativo, lista, objetivo) / 1_000_000:>12,.3f} ms")
